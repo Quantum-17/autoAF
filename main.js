@@ -1,3 +1,6 @@
+/* ===== Automatic AF Script ===== */
+
+/* === Main Function (runs on cell edit) === */
 function main (e) {
  var ss = SpreadsheetApp.getActiveSpreadsheet().getId()
  var eventInformation = getEventInformation(e, ss)
@@ -33,11 +36,16 @@ function getRank (yourTime, course, block) {
              } else lowerBound = midPoint;
         }
         if (yourTime == times[upperBound]) {
-            return 100*block+upperBound+1;
-        } else return 100*block+upperBound+2; //this if else fixes a problem with binary search when your target is != to everything in the search
+            return 100*(block)+upperBound+1;
+        } else {
+          return 100*(block)+upperBound+2; //this if else fixes a problem with binary search when your target is != to everything in the search
+        }
     } 
  }
-//this function was created 1. to make the code cleaner and 2. to avoid a bunch of unecessary creations of the time array (extra for loops)
+
+/* === inbounds check ===
+checks if the time is on a given page
+better than comparing against all times or creating a times array each time */
  function timeInBounds (url, yourTime) {
    var page = UrlFetchApp.fetch(url).getContentText();
     page = page.split("<table class='n' cellspacing='1'>").pop();
@@ -47,10 +55,13 @@ function getRank (yourTime, course, block) {
     return (yourTime <= maxTime && yourTime >= minTime)
  }
 
+/* makes a list of times */
 function getTimeList (url) {
     var page = UrlFetchApp.fetch(url).getContentText();
+    // cuts html down to more or less just the table
     page = page.split("<table class='n' cellspacing='1'>").pop();
-    const fullTable = page.split("<tr>"); //splits on each row of times + some other stuff which we don't want
+    // makes it an array instead of a single string
+    const fullTable = page.split("<tr>"); 
     let times = [100]
     let timesIndex = 0
     for (let i = 0; i < fullTable.length; i++) {
@@ -65,22 +76,18 @@ function getTimeList (url) {
     return times;
 }
 
+/* finds the total number of times for a given track on mk64.com */
 function getTotalTimes(course) {
   var url = "https://www.mariokart64.com/mkds/coursen.php"
   var page = UrlFetchApp.fetch(url).getContentText();
   const fullTable = page.split("<td>"); //see above for this split logic
-  rowContents = fullTable[course+1].split("statcode") //found this string while inspecting the page - simplifies the final array a lot!
-  console.log(rowContents[2])
+  rowContents = fullTable[course+1].split("statcode") //found this split string while inspecting the page - simplifies the final array a lot!
   var totalTimes = String(rowContents[2]).substring(2,rowContents[2].indexOf("<",2)) //more html magic that always gets the right part
   return totalTimes
 }
 
-function getRow (cid) {
-  if (cid < 32) {
-    return cid/2
-  } else return cid/2 + 1
-}
 
+/* gets a page of 100 times for the relevant track */
 function getURL (course,block) {
     var url = "https://www.mariokart64.com/mkds/coursen.php?cid=" + course + "&start=" + block + "01";
     return url
