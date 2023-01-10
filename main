@@ -20,7 +20,7 @@ function getRank (yourTime, course, block) {
     let times = getTimeList(currentURL);
     if (block < 0) {
       return 1; //checks if you have WR
-    } else if (block = maxBlock && yourTime > times[times.length-1]) {
+    } else if (block == maxBlock && yourTime > times[times.length-1]) {
       return getTotalTimes(course)+1; //checks if your time is last place
     } else {
     //binary search in the page for your time
