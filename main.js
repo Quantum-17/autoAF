@@ -106,7 +106,7 @@ function getEventInformation (e, sheet) {
      //getting the block
      oldRank = Sheets.Spreadsheets.Values.get(sheet, "Imported Times!K" + (course+2)).values //+2 to due to offset in the import times page
      var block = 0
-     if(oldRank == ("")) {
+     if(oldRank == ("-")) {
        var totalTimes = getTotalTimes(course) //checks if you don't have a rank and sets the search starting from the last time on the page
        block = Math.floor(totalTimes/100)
      } else block = Math.floor(oldRank/100)
