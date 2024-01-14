@@ -30,18 +30,17 @@ function getRank (yourTime, course, block) {
         var upperBound = times.length-1;
         var lowerBound = 0;
         while (upperBound > lowerBound) {
-          var midPoint = Math.ceil((lowerBound+upperBound)/2);
-          if (yourTime < times[midPoint]) {
-                upperBound = midPoint-1;
-             } else lowerBound = midPoint;
+          var midPoint = Math.floor((lowerBound+upperBound)/2);
+          if (yourTime <= times[midPoint]) {
+                upperBound = midPoint;
+             } else lowerBound = midPoint+1;
+             console.log("lb: "+lowerBound+" ub: "+upperBound+" lTime: "+times[lowerBound]+" uTime: "+times[upperBound]+" yourTime: "+yourTime);
         }
-        if (yourTime == times[upperBound]) {
-            return 100*(block)+upperBound+1;
-        } else {
-          return 100*(block)+upperBound+2; //this if else fixes a problem with binary search when your target is != to everything in the search
-        }
-    } 
- }
+          //+1 is to correct for the array being 0-indexed
+          console.log("return value is: " + (100*block+upperBound+1));
+          return 100*block+upperBound+1;
+    }
+}
 
 /* === inbounds check ===
 checks if the time is on a given page
@@ -105,8 +104,9 @@ function getEventInformation (e, sheet) {
 
      //getting the block
      oldRank = Sheets.Spreadsheets.Values.get(sheet, "Imported Times!K" + (course+2)).values //+2 to due to offset in the import times page
+     console.log("oldRank is: "+oldRank);
      var block = 0
-     if(oldRank == ("-")) {
+     if(oldRank == ("")) {
        var totalTimes = getTotalTimes(course) //checks if you don't have a rank and sets the search starting from the last time on the page
        block = Math.floor(totalTimes/100)
      } else block = Math.floor(oldRank/100)
